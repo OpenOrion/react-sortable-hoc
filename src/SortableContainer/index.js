@@ -414,7 +414,7 @@ export default function sortableContainer(
             this.listenerNode.addEventListener(
               eventName,
               this.handleSortEnd,
-              false,
+              true,
             ),
           );
         }
