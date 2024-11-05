@@ -501,55 +501,57 @@ export default function sortableContainer(
       }
 
       // Remove the helper from the DOM
-      this.helper.parentNode.removeChild(this.helper);
+      if (this.helper && this.helper.parentNode) {
+        this.helper.parentNode.removeChild(this.helper);
 
-      if (hideSortableGhost && this.sortableGhost) {
-        setInlineStyles(this.sortableGhost, {
-          opacity: '',
-          visibility: '',
+        if (hideSortableGhost && this.sortableGhost) {
+          setInlineStyles(this.sortableGhost, {
+            opacity: '',
+            visibility: '',
+          });
+        }
+
+        for (let i = 0, len = nodes.length; i < len; i++) {
+          const node = nodes[i];
+          const el = node.node;
+
+          // Clear the cached offset/boundingClientRect
+          node.edgeOffset = null;
+          node.boundingClientRect = null;
+
+          // Remove the transforms / transitions
+          setTranslate3d(el, null);
+          setTransitionDuration(el, null);
+          node.translate = null;
+        }
+
+        // Stop autoscroll
+        this.autoScroller.clear();
+
+        // Update manager state
+        this.manager.active = null;
+        this.manager.isKeySorting = false;
+
+        this.setState({
+          sorting: false,
+          sortingIndex: null,
         });
+
+        if (typeof onSortEnd === 'function') {
+          onSortEnd(
+            {
+              collection,
+              newIndex: this.newIndex,
+              oldIndex: this.index,
+              isKeySorting,
+              nodes,
+            },
+            event,
+          );
+        }
+
+        this.touched = false;
       }
-
-      for (let i = 0, len = nodes.length; i < len; i++) {
-        const node = nodes[i];
-        const el = node.node;
-
-        // Clear the cached offset/boundingClientRect
-        node.edgeOffset = null;
-        node.boundingClientRect = null;
-
-        // Remove the transforms / transitions
-        setTranslate3d(el, null);
-        setTransitionDuration(el, null);
-        node.translate = null;
-      }
-
-      // Stop autoscroll
-      this.autoScroller.clear();
-
-      // Update manager state
-      this.manager.active = null;
-      this.manager.isKeySorting = false;
-
-      this.setState({
-        sorting: false,
-        sortingIndex: null,
-      });
-
-      if (typeof onSortEnd === 'function') {
-        onSortEnd(
-          {
-            collection,
-            newIndex: this.newIndex,
-            oldIndex: this.index,
-            isKeySorting,
-            nodes,
-          },
-          event,
-        );
-      }
-
-      this.touched = false;
     };
 
     updateHelperPosition(event) {

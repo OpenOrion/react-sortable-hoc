@@ -1274,49 +1274,51 @@ function sortableContainer(WrappedComponent) {
               }
             }
 
-            _this.helper.parentNode.removeChild(_this.helper);
+            if (_this.helper && _this.helper.parentNode) {
+              _this.helper.parentNode.removeChild(_this.helper);
 
-            if (hideSortableGhost && _this.sortableGhost) {
-              setInlineStyles(_this.sortableGhost, {
-                opacity: '',
-                visibility: '',
+              if (hideSortableGhost && _this.sortableGhost) {
+                setInlineStyles(_this.sortableGhost, {
+                  opacity: '',
+                  visibility: '',
+                });
+              }
+
+              for (var i = 0, len = nodes.length; i < len; i++) {
+                var _node2 = nodes[i];
+                var el = _node2.node;
+                _node2.edgeOffset = null;
+                _node2.boundingClientRect = null;
+                setTranslate3d(el, null);
+                setTransitionDuration(el, null);
+                _node2.translate = null;
+              }
+
+              _this.autoScroller.clear();
+
+              _this.manager.active = null;
+              _this.manager.isKeySorting = false;
+
+              _this.setState({
+                sorting: false,
+                sortingIndex: null,
               });
+
+              if (typeof onSortEnd === 'function') {
+                onSortEnd(
+                  {
+                    collection: collection,
+                    newIndex: _this.newIndex,
+                    oldIndex: _this.index,
+                    isKeySorting: isKeySorting,
+                    nodes: nodes,
+                  },
+                  event,
+                );
+              }
+
+              _this.touched = false;
             }
-
-            for (var i = 0, len = nodes.length; i < len; i++) {
-              var _node2 = nodes[i];
-              var el = _node2.node;
-              _node2.edgeOffset = null;
-              _node2.boundingClientRect = null;
-              setTranslate3d(el, null);
-              setTransitionDuration(el, null);
-              _node2.translate = null;
-            }
-
-            _this.autoScroller.clear();
-
-            _this.manager.active = null;
-            _this.manager.isKeySorting = false;
-
-            _this.setState({
-              sorting: false,
-              sortingIndex: null,
-            });
-
-            if (typeof onSortEnd === 'function') {
-              onSortEnd(
-                {
-                  collection: collection,
-                  newIndex: _this.newIndex,
-                  oldIndex: _this.index,
-                  isKeySorting: isKeySorting,
-                  nodes: nodes,
-                },
-                event,
-              );
-            }
-
-            _this.touched = false;
           },
         );
 
